@@ -85,7 +85,7 @@ The suite runs against a real Postgres database (it drops and recreates the sche
 4. Make a test booking and check both emails arrive (client confirmation includes a calendar file).
 
 ### 5. Scheduled job
-- [ ] Vercel: `vercel.json` already schedules `/api/cron` every 5 minutes (sub‑daily crons need a Pro plan). Vercel sends `Authorization: Bearer $CRON_SECRET` automatically.
+- [ ] Vercel: `vercel.json` schedules `/api/cron` once a day so it deploys on the free Hobby plan. On Pro, change the schedule to `*/5 * * * *`; on Hobby, also call it every 5 minutes from an external scheduler (below). Vercel sends `Authorization: Bearer $CRON_SECRET` automatically.
 - [ ] Elsewhere: call `GET /api/cron` with header `Authorization: Bearer <CRON_SECRET>` every 5 minutes (GitHub Actions, cron-job.org, systemd timer…).
 - [ ] Dashboard → Settings shows "Scheduled jobs: Running" once it has run.
 
@@ -103,12 +103,13 @@ The suite runs against a real Postgres database (it drops and recreates the sche
 
 1. Push this repository to GitHub and import it in Vercel (framework: Next.js).
 2. Add all variables from `.env.example` in Project → Settings → Environment Variables (Production). Never commit `.env`.
-3. Deploy. Then run migrations/seed/admin creation from your machine against the production `DATABASE_URL`:
+3. Deploy. The `vercel-build` script runs `scripts/deploy-setup.ts` before `next build`: it applies migrations and seeds default content on every deploy (both are safe to repeat), and creates the first admin if `ADMIN_EMAIL` and `ADMIN_PASSWORD` are set (an existing admin is never changed; remove `ADMIN_PASSWORD` afterwards). Without `DATABASE_URL` it is skipped. You can still run the steps by hand:
    ```bash
    DATABASE_URL=… DATABASE_SSL=true npm run db:migrate
    DATABASE_URL=… DATABASE_SSL=true npm run db:seed
    DATABASE_URL=… DATABASE_SSL=true npm run admin:create -- --email tony@…
    ```
+   If `SITE_URL` is not set, the Vercel production URL (`https://<project>.vercel.app`) is used.
 4. Add the custom domain; HTTPS is automatic. HSTS is sent in production.
 5. Complete the Google, Stripe and Resend steps above using the production domain.
 

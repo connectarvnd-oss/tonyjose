@@ -1,5 +1,6 @@
 // Usage: npm run admin:create -- --email tony@example.com --name "Tony Jose" [--role owner|staff]
 // The password is read from ADMIN_PASSWORD or prompted interactively.
+// --if-missing leaves an existing admin with that email untouched (used on deploy).
 import "dotenv/config";
 import bcrypt from "bcryptjs";
 import { Client } from "pg";
@@ -15,6 +16,7 @@ async function main() {
   const name = arg("name") ?? process.env.ADMIN_NAME ?? "Tony Jose";
   const role = arg("role") ?? "owner";
   if (!email) throw new Error("Provide --email");
+  const ifMissing = process.argv.includes("--if-missing");
   let password = process.env.ADMIN_PASSWORD;
   if (!password) {
     const rl = createInterface({ input: process.stdin, output: process.stdout });
@@ -26,7 +28,9 @@ async function main() {
   const db = new Client({ connectionString: process.env.DATABASE_URL, ssl: process.env.DATABASE_SSL === "true" ? { rejectUnauthorized: false } : undefined });
   await db.connect();
   const existing = await db.query(`SELECT id FROM admin_users WHERE lower(email) = lower($1)`, [email]);
-  if (existing.rowCount) {
+  if (existing.rowCount && ifMissing) {
+    console.log(`Admin ${email} already exists, leaving it unchanged.`);
+  } else if (existing.rowCount) {
     await db.query(`UPDATE admin_users SET password_hash = $1, name = $2, role = $3 WHERE id = $4`, [hash, name, role, existing.rows[0].id]);
     await db.query(`DELETE FROM admin_sessions WHERE admin_id = $1`, [existing.rows[0].id]);
     console.log(`Updated admin ${email} (existing sessions signed out).`);
