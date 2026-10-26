@@ -33,7 +33,7 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   ...(process.env.SITE_URL ? { env: { SITE_URL: process.env.SITE_URL } } : {}),
-  serverExternalPackages: ["pg", "bcryptjs"],
+  serverExternalPackages: ["pg", "bcryptjs", "nodemailer"],
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

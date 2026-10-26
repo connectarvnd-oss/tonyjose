@@ -39,14 +39,16 @@ export async function integrationStatus(): Promise<IntegrationState[]> {
   }
 
   // Email
-  const resend = (process.env.EMAIL_PROVIDER ?? (process.env.RESEND_API_KEY ? "resend" : "console")) === "resend" && Boolean(process.env.RESEND_API_KEY);
-  const from = s.email.fromAddress || process.env.EMAIL_FROM;
-  if (!resend) {
-    out.push({ key: "email", label: "Email", ok: false, live: false, status: "Not sending (log only)", detail: "Emails are written to the server log, not delivered. Add RESEND_API_KEY and a verified sender address." });
+  const emailProvider = process.env.EMAIL_PROVIDER ?? (process.env.RESEND_API_KEY ? "resend" : "console");
+  const resend = emailProvider === "resend" && Boolean(process.env.RESEND_API_KEY);
+  const smtp = emailProvider === "smtp" && Boolean(process.env.SMTP_USER && process.env.SMTP_PASSWORD);
+  const from = s.email.fromAddress || process.env.EMAIL_FROM || (smtp ? process.env.SMTP_USER : undefined);
+  if (!resend && !smtp) {
+    out.push({ key: "email", label: "Email", ok: false, live: false, status: "Not sending (log only)", detail: "Emails are written to the server log, not delivered. Add RESEND_API_KEY and a verified sender address, or SMTP_USER and SMTP_PASSWORD." });
   } else if (!from) {
     out.push({ key: "email", label: "Email", ok: false, live: false, status: "Sender missing", detail: "Set a sender address (Settings → Email) on a domain verified in Resend." });
   } else {
-    out.push({ key: "email", label: "Email", ok: true, live: true, status: "Resend", detail: `Sending from ${s.email.fromName} <${from}>.` });
+    out.push({ key: "email", label: "Email", ok: true, live: true, status: smtp ? "SMTP" : "Resend", detail: `Sending from ${s.email.fromName} <${from}>.` });
   }
   const adminEmail = s.notifications.adminEmail || process.env.ADMIN_NOTIFICATION_EMAIL;
   if (!adminEmail) out.push({ key: "admin-email", label: "Tony's notifications", ok: false, live: false, status: "No address", detail: "Set the notification email in Settings so Tony receives booking alerts." });
