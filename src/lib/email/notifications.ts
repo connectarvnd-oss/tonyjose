@@ -149,7 +149,7 @@ export async function processDueNotifications(opts: { appointmentId?: string; li
   const rows = await db.select().from(notifications).where(inArray(notifications.id, ids));
   const { email } = await getSettings("email");
   const mailer = integrations().mailer();
-  const fromAddress = email.fromAddress || process.env.EMAIL_FROM || "bookings@example.com";
+  const fromAddress = email.fromAddress || process.env.EMAIL_FROM || process.env.SMTP_USER || "bookings@example.com";
   const from = `${email.fromName} <${fromAddress}>`;
   let sent = 0, failed = 0, skipped = 0;
 

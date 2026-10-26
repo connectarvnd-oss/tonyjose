@@ -57,9 +57,9 @@ export const env = {
     },
   },
   email: {
-    get provider(): "resend" | "console" {
+    get provider(): "resend" | "smtp" | "console" {
       const p = optional("EMAIL_PROVIDER");
-      if (p === "resend" || p === "console") return p;
+      if (p === "resend" || p === "smtp" || p === "console") return p;
       return optional("RESEND_API_KEY") ? "resend" : "console";
     },
     get resendApiKey() {

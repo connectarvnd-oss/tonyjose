@@ -10,7 +10,7 @@ export type EmailMessage = {
 };
 
 export interface Mailer {
-  id: "resend" | "console";
+  id: "resend" | "smtp" | "console";
   live: boolean;
   send(msg: EmailMessage): Promise<{ id: string }>;
 }

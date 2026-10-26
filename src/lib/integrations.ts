@@ -2,7 +2,7 @@
 // with fakes through setIntegrationsForTesting().
 import type { TimeRange } from "./availability/engine";
 import * as google from "./google/calendar";
-import { ConsoleMailer, ResendMailer } from "./email/providers";
+import { ConsoleMailer, ResendMailer, SmtpMailer } from "./email/providers";
 import type { Mailer } from "./email/types";
 import { StripeProvider } from "./payments/stripe";
 import { TestPaymentProvider } from "./payments/test-provider";
@@ -49,6 +49,14 @@ let consoleMailer: ConsoleMailer | null = null;
 function defaultMailer(): Mailer {
   const provider = process.env.EMAIL_PROVIDER ?? (process.env.RESEND_API_KEY ? "resend" : "console");
   if (provider === "resend" && process.env.RESEND_API_KEY) return new ResendMailer(process.env.RESEND_API_KEY);
+  if (provider === "smtp" && process.env.SMTP_USER && process.env.SMTP_PASSWORD) {
+    return new SmtpMailer({
+      host: process.env.SMTP_HOST || "smtp.gmail.com",
+      port: Number(process.env.SMTP_PORT || 465),
+      user: process.env.SMTP_USER,
+      password: process.env.SMTP_PASSWORD,
+    });
+  }
   consoleMailer ??= new ConsoleMailer();
   return consoleMailer;
 }

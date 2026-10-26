@@ -84,6 +84,8 @@ The suite runs against a real Postgres database (it drops and recreates the sche
 3. In Settings → Notifications, set Tony's notification email. Adjust reminder timings and templates in Settings → Email.
 4. Make a test booking and check both emails arrive (client confirmation includes a calendar file).
 
+**Alternative without a domain: Gmail (SMTP).** Turn on 2-Step Verification for the Google account, create an app password at <https://myaccount.google.com/apppasswords>, then set `EMAIL_PROVIDER=smtp`, `SMTP_USER=<the gmail address>`, `SMTP_PASSWORD=<app password>` (host/port default to `smtp.gmail.com:465`). Emails are sent from that Gmail address; Gmail allows roughly 500 per day.
+
 ### 5. Scheduled job
 - [ ] Vercel: `vercel.json` schedules `/api/cron` once a day so it deploys on the free Hobby plan. On Pro, change the schedule to `*/5 * * * *`; on Hobby, also call it every 5 minutes from an external scheduler (below). Vercel sends `Authorization: Bearer $CRON_SECRET` automatically.
 - [ ] Elsewhere: call `GET /api/cron` with header `Authorization: Bearer <CRON_SECRET>` every 5 minutes (GitHub Actions, cron-job.org, systemd timer…).
