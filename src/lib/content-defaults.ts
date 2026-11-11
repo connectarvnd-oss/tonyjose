@@ -67,7 +67,7 @@ export const defaultContent = {
   contact: {
     email: CONTACT_EMAIL,
     phone: "",
-    addressLines: ["[Business address — to be completed]"],
+    addressLines: [] as string[],
     responseNote: "Replies usually within two working days.",
   },
   disclaimer: {

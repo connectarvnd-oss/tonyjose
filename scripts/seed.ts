@@ -61,6 +61,11 @@ async function main() {
      WHERE key = 'contact' AND value->>'email' = 'hello@example.com'`,
     [CONTACT_EMAIL],
   );
+  // Remove the original address placeholder from the footer.
+  await db.query(
+    `UPDATE site_content SET value = jsonb_set(value, '{addressLines}', '[]'::jsonb), updated_at = now()
+     WHERE key = 'contact' AND value->'addressLines' = '["[Business address — to be completed]"]'::jsonb`,
+  );
   await db.query(
     `UPDATE legal_pages SET body_md = replace(body_md, '[Email address]', $1)
      WHERE position('[Email address]' in body_md) > 0`,
