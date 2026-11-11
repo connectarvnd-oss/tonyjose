@@ -1,6 +1,8 @@
 // Default website copy. Everything here is editable from /admin/content and
 // stored in the database; these values are used for seeding and as fallbacks.
 
+export const CONTACT_EMAIL = "tonyjosekuruppath@gmail.com";
+
 export const defaultContent = {
   brand: {
     name: "Tony Jose",
@@ -63,7 +65,7 @@ export const defaultContent = {
     cta: "Find a Time to Talk",
   },
   contact: {
-    email: "hello@example.com",
+    email: CONTACT_EMAIL,
     phone: "",
     addressLines: ["[Business address — to be completed]"],
     responseNote: "Replies usually within two working days.",
@@ -166,7 +168,7 @@ ${P("Country")}
 
 ## Contact
 
-Email: ${P("Email address")}
+Email: ${CONTACT_EMAIL}
 Phone: ${P("Phone number")}
 
 ## VAT / business registration
@@ -194,7 +196,7 @@ Consultations provide guidance and information only and do not constitute legal 
 
 ## 1. Controller
 
-${P("Full legal name")}, ${P("Business address")}, ${P("Email address")}.
+${P("Full legal name")}, ${P("Business address")}, ${CONTACT_EMAIL}.
 
 ## 2. What we collect
 
@@ -229,7 +231,7 @@ This website uses only strictly necessary cookies. See the Cookie Policy.
 
 ## 7. Your rights
 
-You have the right to access, rectification, erasure, restriction, data portability and objection, and to withdraw consent at any time. Contact ${P("Email address")}. You may also lodge a complaint with a supervisory authority, e.g. ${P("competent data protection authority")}.
+You have the right to access, rectification, erasure, restriction, data portability and objection, and to withdraw consent at any time. Contact ${CONTACT_EMAIL}. You may also lodge a complaint with a supervisory authority, e.g. ${P("competent data protection authority")}.
 `,
   },
   {
@@ -297,7 +299,7 @@ In the rare case that your payment completes after your reserved time was releas
 
 Refunds are issued via Stripe to the original payment method and usually appear within 5–10 business days.
 
-Questions: ${P("Email address")}
+Questions: ${CONTACT_EMAIL}
 `,
   },
   {

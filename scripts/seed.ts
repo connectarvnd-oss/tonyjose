@@ -2,7 +2,7 @@
 // rows are never overwritten.
 import "dotenv/config";
 import { Client } from "pg";
-import { defaultContent, defaultFaqs, defaultLegalPages, defaultServices } from "../src/lib/content-defaults";
+import { CONTACT_EMAIL, defaultContent, defaultFaqs, defaultLegalPages, defaultServices } from "../src/lib/content-defaults";
 
 async function main() {
   const db = new Client({
@@ -53,6 +53,19 @@ async function main() {
   for (const [key, value] of Object.entries(defaultContent)) {
     await db.query(`INSERT INTO site_content (key, value) VALUES ($1,$2) ON CONFLICT (key) DO NOTHING`, [key, JSON.stringify(value)]);
   }
+
+  // Fill in the public contact email where the original placeholders are still in place.
+  // Values that were already changed in the admin panel are left untouched.
+  await db.query(
+    `UPDATE site_content SET value = jsonb_set(value, '{email}', to_jsonb($1::text)), updated_at = now()
+     WHERE key = 'contact' AND value->>'email' = 'hello@example.com'`,
+    [CONTACT_EMAIL],
+  );
+  await db.query(
+    `UPDATE legal_pages SET body_md = replace(body_md, '[Email address]', $1)
+     WHERE position('[Email address]' in body_md) > 0`,
+    [CONTACT_EMAIL],
+  );
 
   console.log("Seed complete.");
   await db.end();
